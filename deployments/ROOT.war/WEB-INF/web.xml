@@ -314,7 +314,7 @@
 		<param-value>r</param-value>
 	</context-param>
 
-	<!-- Controls creating a repository as --shared on Unix servers. -->
+	<!-- Controls creating a repository as shared on Unix servers. -->
 	<!-- In an Unix environment where mixed access methods exist for shared repositories, -->
 	<!-- the repository should be created with 'git init --shared' to make sure that -->
 	<!-- it can be accessed e.g. via ssh (user git) and http (user www-data). -->
