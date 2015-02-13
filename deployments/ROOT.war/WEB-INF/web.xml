@@ -1,0 +1,2219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<!-- The base folder is used to specify the root location of your Gitblit data.
+	
+			${baseFolder}/gitblit.properties
+			${baseFolder}/users.conf
+			${baseFolder}/projects.conf
+			${baseFolder}/robots.txt
+			${baseFolder}/git
+			${baseFolder}/groovy
+			${baseFolder}/groovy/grape
+			${baseFolder}/proposals
+
+		By default, this location is WEB-INF/data.  It is recommended to set this
+		path to a location outside your webapps folder that is writable by your
+		servlet container.  Gitblit will copy the WEB-INF/data files to that
+		location for you when it restarts.  This approach makes upgrading simpler.
+		All you have to do is set this parameter for the new release and then
+		review the defaults for any new settings.  Settings are always versioned
+		with a SINCE x.y.z attribute and also noted in the release changelog.
+		-->
+	<env-entry>
+		<description>The base folder is used to specify the root location of your Gitblit data.</description>
+		<env-entry-name>baseFolder</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>${contextFolder}/WEB-INF/data</env-entry-value>
+	</env-entry>
+	
+	<!-- Gitblit Displayname -->
+	<display-name>
+		Gitblit - 1.5.1
+	</display-name>
+
+	
+	<!-- Base folder for repositories. -->
+	<!-- This folder may contain bare and non-bare repositories but Gitblit will only -->
+	<!-- allow you to push to bare repositories. -->
+	<!-- Use forward slashes even on Windows!! -->
+	<!-- e.g. c:/gitrepos -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>git.repositoriesFolder</param-name>
+		<param-value>${baseFolder}/git</param-value>
+	</context-param>
+
+	<!-- Build the available repository list at startup and cache this list for reuse. -->
+	<!-- This reduces disk io when presenting the repositories page, responding to rpcs, -->
+	<!-- etc, but it means that  Gitblit will not automatically identify repositories -->
+	<!-- added or deleted by external tools. -->
+	<!-- For this case you can use curl, wget, etc to issue an rpc request to clear the -->
+	<!-- cache (e.g. https://localhost/rpc?req=CLEAR_REPOSITORY_CACHE) -->
+	<!-- SINCE 1.1.0 -->
+	<context-param>
+		<param-name>git.cacheRepositoryList</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Search the repositories folder subfolders for other repositories. -->
+	<!-- Repositories MAY NOT be nested (i.e. one repository within another) -->
+	<!-- but they may be grouped together in subfolders. -->
+	<!-- e.g. c:/gitrepos/libraries/mylibrary.git -->
+	<!-- c:/gitrepos/libraries/myotherlibrary.git -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>git.searchRepositoriesSubfolders</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Maximum number of folders to recurse into when searching for repositories. -->
+	<!-- The default value, -1, disables depth limits. -->
+	<!-- SINCE 1.1.0 -->
+	<context-param>
+		<param-name>git.searchRecursionDepth</param-name>
+		<param-value>-1</param-value>
+	</context-param>
+
+	<!-- List of regex exclusion patterns to match against folders found in -->
+	<!-- *git.repositoriesFolder*. -->
+	<!-- Use forward slashes even on Windows!! -->
+	<!-- e.g. test/jgit\.git -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.1.0 -->
+	<context-param>
+		<param-name>git.searchExclusions</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- List of regex url patterns for extracting a repository name when locating -->
+	<!-- submodules. -->
+	<!-- e.g. git.submoduleUrlPatterns = .*?://github.com/(.*) will extract -->
+	<!-- *gitblit/gitblit.git* from *git://github.com/gitblit/gitblit.git* -->
+	<!-- If no matches are found then the submodule repository name is assumed to be -->
+	<!-- whatever trails the last / character. (e.g. gitblit.git). -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.1.0 -->
+	<context-param>
+		<param-name>git.submoduleUrlPatterns</param-name>
+		<param-value>.*?://github.com/(.*)</param-value>
+	</context-param>
+
+	<!-- Specify the interface for Git Daemon to bind it's service. -->
+	<!-- You may specify an ip or an empty value to bind to all interfaces. -->
+	<!-- Specifying localhost will result in Gitblit ONLY listening to requests to -->
+	<!-- localhost. -->
+	<!-- SINCE 1.3.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.daemonBindInterface</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- port for serving the Git Daemon service.  <= 0 disables this service. -->
+	<!-- On Unix/Linux systems, ports < 1024 require root permissions. -->
+	<!-- Recommended value: 9418 -->
+	<!-- SINCE 1.3.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.daemonPort</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- The port for serving the SSH service.  <= 0 disables this service. -->
+	<!-- On Unix/Linux systems, ports < 1024 require root permissions. -->
+	<!-- Recommended value: 29418 -->
+	<!-- SINCE 1.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.sshPort</param-name>
+		<param-value>29418</param-value>
+	</context-param>
+
+	<!-- Specify the interface for the SSH daemon to bind its service. -->
+	<!-- You may specify an ip or an empty value to bind to all interfaces. -->
+	<!-- Specifying localhost will result in Gitblit ONLY listening to requests to -->
+	<!-- localhost. -->
+	<!-- SINCE 1.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.sshBindInterface</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Specify the SSH key manager to use for retrieving, storing, and removing -->
+	<!-- SSH keys. -->
+	<!-- Valid key managers are: -->
+	<!-- com.gitblit.transport.ssh.FileKeyManager -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.sshKeysManager</param-name>
+		<param-value>com.gitblit.transport.ssh.FileKeyManager</param-value>
+	</context-param>
+
+	<!-- Directory for storing user SSH keys when using the FileKeyManager. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.sshKeysFolder</param-name>
+		<param-value>${baseFolder}/ssh</param-value>
+	</context-param>
+
+	<!-- SSH backend NIO2|MINA. -->
+	<!-- The Apache Mina project recommends using the NIO2 backend. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.sshBackend</param-name>
+		<param-value>NIO2</param-value>
+	</context-param>
+
+	<!-- Number of threads used to parse a command line submitted by a client over SSH -->
+	<!-- for execution, create the internal data structures used by that command, -->
+	<!-- and schedule it for execution on another thread. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.sshCommandStartThreads</param-name>
+		<param-value>2</param-value>
+	</context-param>
+
+	<!-- Allow push/pull over http/https with JGit servlet. -->
+	<!-- If you do NOT want to allow Git clients to clone/push to Gitblit set this -->
+	<!-- to false.  You might want to do this if you are only using ssh:// or git://. -->
+	<!-- If you set this false, consider changing the *web.otherUrls* setting to -->
+	<!-- indicate your clone/push urls. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>git.enableGitServlet</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- If you want to restrict all git servlet access to those with valid X509 client -->
+	<!-- certificates then set this value to true. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.requiresClientCertificate</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Enforce date checks on client certificates to ensure that they are not being -->
+	<!-- used prematurely and that they have not expired. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.enforceCertificateValidity</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- List of OIDs to extract from a client certificate DN to map a certificate to -->
+	<!-- an account username. -->
+	<!-- e.g. git.certificateUsernameOIDs = CN -->
+	<!-- e.g. git.certificateUsernameOIDs = FirstName LastName -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.certificateUsernameOIDs</param-name>
+		<param-value>CN</param-value>
+	</context-param>
+
+	<!-- Only serve/display bare repositories. -->
+	<!-- If there are non-bare repositories in git.repositoriesFolder and this setting -->
+	<!-- is true, they will be excluded from the ui. -->
+	<!-- SINCE 0.9.0 -->
+	<context-param>
+		<param-name>git.onlyAccessBareRepositories</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Specify the list of acceptable transports for pushes. -->
+	<!-- If this setting is empty, all transports are acceptable. -->
+	<!-- Valid choices are: GIT HTTP HTTPS SSH -->
+	<!-- SINCE 1.5.0 -->
+	<!-- SPACE-DELIMITED -->
+	<context-param>
+		<param-name>git.acceptedPushTransports</param-name>
+		<param-value>HTTP HTTPS SSH</param-value>
+	</context-param>
+
+	<!-- Allow an authenticated user to create a destination repository on a push if -->
+	<!-- the repository does not already exist. -->
+	<!-- Administrator accounts can create a repository in any project. -->
+	<!-- These repositories are created with the default access restriction and authorization -->
+	<!-- control values.  The pushing account is set as the owner. -->
+	<!-- Non-administrator accounts with the CREATE role may create personal repositories. -->
+	<!-- These repositories are created as VIEW restricted for NAMED users. -->
+	<!-- The pushing account is set as the owner. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.allowCreateOnPush</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Global setting to control anonymous pushes. -->
+	<!-- This setting allows/rejects anonymous pushes at the level of the receive pack. -->
+	<!-- This trumps all repository config settings.  While anonymous pushes are convenient -->
+	<!-- on your own box when you are a lone developer,  they are not recommended for -->
+	<!-- any multi-user installation where accountability is required.  Since Gitblit -->
+	<!-- tracks pushes and user accounts, allowing anonymous pushes compromises that -->
+	<!-- information. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>git.allowAnonymousPushes</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- The default access restriction for new repositories. -->
+	<!-- Valid values are NONE, PUSH, CLONE, VIEW -->
+	<!-- NONE = anonymous view, clone, & push -->
+	<!-- PUSH = anonymous view & clone and authenticated push -->
+	<!-- CLONE = anonymous view, authenticated clone & push -->
+	<!-- VIEW = authenticated view, clone, & push -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>git.defaultAccessRestriction</param-name>
+		<param-value>PUSH</param-value>
+	</context-param>
+
+	<!-- The default authorization control for new repositories. -->
+	<!-- Valid values are AUTHENTICATED and NAMED -->
+	<!-- AUTHENTICATED = any authenticated user is granted restricted access -->
+	<!-- NAMED = only named users/teams are granted restricted access -->
+	<!-- SINCE 1.1.0 -->
+	<context-param>
+		<param-name>git.defaultAuthorizationControl</param-name>
+		<param-value>NAMED</param-value>
+	</context-param>
+
+	<!-- The prefix for a users personal repository directory. -->
+	<!-- Personal user repositories are created in this directory, named by the user name -->
+	<!-- prefixed with the userRepositoryPrefix. For eaxmple, a user 'john' would have his -->
+	<!-- personal repositories in the directory '~john'. -->
+	<!-- Cannot be an empty string. Also, absolute paths are changed to relative paths by -->
+	<!-- removing the first directory separator. -->
+	<!-- It is not recommended to change this value AFTER your user's have created -->
+	<!-- personal repositories because it will break all permissions, ownership, and -->
+	<!-- repository push/pull operations. -->
+	<!-- RESTART REQUIRED -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>git.userRepositoryPrefix</param-name>
+		<param-value>~</param-value>
+	</context-param>
+
+	<!-- The default incremental push tag prefix.  Tag prefix applied to a repository -->
+	<!-- that has automatic push tags enabled and does not specify a custom tag prefix. -->
+	<!-- If incremental push tags are enabled, the tips of each branch in the push will -->
+	<!-- be tagged with an increasing revision integer. -->
+	<!-- e.g. refs/tags/r2345 or refs/tags/rev_2345 -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>git.defaultIncrementalPushTagPrefix</param-name>
+		<param-value>r</param-value>
+	</context-param>
+
+	<!-- Controls creating a repository as --shared on Unix servers. -->
+	<!-- In an Unix environment where mixed access methods exist for shared repositories, -->
+	<!-- the repository should be created with 'git init --shared' to make sure that -->
+	<!-- it can be accessed e.g. via ssh (user git) and http (user www-data). -->
+	<!-- Valid values are the values available for the '--shared' option. The the manual -->
+	<!-- page for 'git init' for more information on shared repositories. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>git.createRepositoriesShared</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Enable JGit-based garbage collection. (!!EXPERIMENTAL!!) -->
+	<!-- USE AT YOUR OWN RISK! -->
+	<!-- If enabled, the garbage collection executor scans all repositories once a day -->
+	<!-- at the hour of your choosing.  The GC executor will take each repository "offline", -->
+	<!-- one-at-a-time, to check if the repository satisfies it's GC trigger requirements. -->
+	<!-- While the repository is offline it will be inaccessible from the web UI or from -->
+	<!-- any of the other services (git, rpc, rss, etc). -->
+	<!-- Gitblit's GC Executor MAY NOT PLAY NICE with the other Git kids on the block, -->
+	<!-- especially on Windows systems, so if you are using other tools please coordinate -->
+	<!-- their usage with your GC Executor schedule or do not use this feature. -->
+	<!-- The GC algorithm complex and the JGit team advises caution when using their -->
+	<!-- young implementation of GC. -->
+	<!-- http://wiki.eclipse.org/EGit/New_and_Noteworthy/2.1#Garbage_Collector_and_Repository_Storage_Statistics -->
+	<!-- EXPERIMENTAL -->
+	<!-- SINCE 1.2.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.enableGarbageCollection</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Hour of the day for the GC Executor to scan repositories. -->
+	<!-- This value is in 24-hour time. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.garbageCollectionHour</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- The default minimum total filesize of loose objects to trigger early garbage -->
+	<!-- collection. -->
+	<!-- You may specify a custom threshold for a repository in the repository's settings. -->
+	<!-- Common unit suffixes of k, m, or g are supported. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.defaultGarbageCollectionThreshold</param-name>
+		<param-value>500k</param-value>
+	</context-param>
+
+	<!-- The default period, in days, between GCs for a repository.  If the total filesize -->
+	<!-- of the loose object exceeds *git.garbageCollectionThreshold* or the repository's -->
+	<!-- custom threshold, this period will be short-circuited. -->
+	<!-- e.g. if a repository collects 100KB of loose objects every day with a 500KB -->
+	<!-- threshold and a period of 7 days, it will take 5 days for the loose objects to -->
+	<!-- be collected, packed, and pruned. -->
+	<!-- OR -->
+	<!-- if a repository collects 10KB of loose objects every day with a 500KB threshold -->
+	<!-- and a period of 7 days, it will take the full 7 days for the loose objects to be -->
+	<!-- collected, packed, and pruned. -->
+	<!-- You may specify a custom period for a repository in the repository's settings. -->
+	<!-- The minimum value is 1 day since the GC Executor only runs once a day. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>git.defaultGarbageCollectionPeriod</param-name>
+		<param-value>7</param-value>
+	</context-param>
+
+	<!-- Gitblit can automatically fetch ref updates for a properly configured mirror -->
+	<!-- repository. -->
+	<!-- Requirements: -->
+	<!-- 1. you must manually clone the repository using native git -->
+	<!-- git clone --mirror git://somewhere.com/myrepo.git -->
+	<!-- 2. the "origin" remote must be the mirror source -->
+	<!-- 3. the "origin" repository must be accessible without authentication OR the -->
+	<!-- credentials must be embedded in the origin url (not recommended) -->
+	<!-- Notes: -->
+	<!-- 1. "origin" SSH urls are untested and not likely to work -->
+	<!-- 2. mirrors cloned while Gitblit is running are likely to require clearing the -->
+	<!-- gitblit cache (link on the repositories page of an administrator account) -->
+	<!-- 3. Gitblit will automatically repair any invalid fetch refspecs with a "//" -->
+	<!-- sequence. -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.enableMirroring</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Specify the period between update checks for mirrored repositories. -->
+	<!-- The shortest period you may specify between mirror update checks is 5 mins. -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.mirrorPeriod</param-name>
+		<param-value>30 mins</param-value>
+	</context-param>
+
+	<!-- Number of bytes of a pack file to load into memory in a single read operation. -->
+	<!-- This is the "page size" of the JGit buffer cache, used for all pack access -->
+	<!-- operations. All disk IO occurs as single window reads. Setting this too large -->
+	<!-- may cause the process to load more data than is required; setting this too small -->
+	<!-- may increase the frequency of read() system calls. -->
+	<!-- Default on JGit is 8 KiB on all platforms. -->
+	<!-- Common unit suffixes of k, m, or g are supported. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.packedGitWindowSize</param-name>
+		<param-value>8k</param-value>
+	</context-param>
+
+	<!-- Maximum number of bytes to load and cache in memory from pack files. If JGit -->
+	<!-- needs to access more than this many bytes it will unload less frequently used -->
+	<!-- windows to reclaim memory space within the process. As this buffer must be shared -->
+	<!-- with the rest of the JVM heap, it should be a fraction of the total memory available. -->
+	<!-- The JGit team recommends setting this value larger than the size of your biggest -->
+	<!-- repository. This ensures you can serve most requests from memory. -->
+	<!-- Default on JGit is 10 MiB on all platforms. -->
+	<!-- Common unit suffixes of k, m, or g are supported. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.packedGitLimit</param-name>
+		<param-value>10m</param-value>
+	</context-param>
+
+	<!-- Maximum number of bytes to reserve for caching base objects that multiple deltafied -->
+	<!-- objects reference. By storing the entire decompressed base object in a cache Git -->
+	<!-- is able to avoid unpacking and decompressing frequently used base objects multiple times. -->
+	<!-- Default on JGit is 10 MiB on all platforms. You probably do not need to adjust -->
+	<!-- this value. -->
+	<!-- Common unit suffixes of k, m, or g are supported. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.deltaBaseCacheLimit</param-name>
+		<param-value>10m</param-value>
+	</context-param>
+
+	<!-- Maximum number of pack files to have open at once. A pack file must be opened -->
+	<!-- in order for any of its data to be available in a cached window. -->
+	<!-- If you increase this to a larger setting you may need to also adjust the ulimit -->
+	<!-- on file descriptors for the host JVM, as Gitblit needs additional file descriptors -->
+	<!-- available for network sockets and other repository data manipulation. -->
+	<!-- Default on JGit is 128 file descriptors on all platforms. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.packedGitOpenFiles</param-name>
+		<param-value>128</param-value>
+	</context-param>
+
+	<!-- Largest object size, in bytes, that JGit will allocate as a contiguous byte -->
+	<!-- array. Any file revision larger than this threshold will have to be streamed, -->
+	<!-- typically requiring the use of temporary files under $GIT_DIR/objects to implement -->
+	<!-- psuedo-random access during delta decompression. -->
+	<!-- Servers with very high traffic should set this to be larger than the size of -->
+	<!-- their common big files. For example a server managing the Android platform -->
+	<!-- typically has to deal with ~10-12 MiB XML files, so 15 m would be a reasonable -->
+	<!-- setting in that environment. Setting this too high may cause the JVM to run out -->
+	<!-- of heap space when handling very big binary files, such as device firmware or -->
+	<!-- CD-ROM ISO images. Make sure to adjust your JVM heap accordingly. -->
+	<!-- Default is 50 MiB on all platforms. -->
+	<!-- Common unit suffixes of k, m, or g are supported. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- NOTE: The importance of JGit's streamFileTreshold AND Git's bigFileThreshold -->
+	<!-- ISSUE: https://bugs.eclipse.org/bugs/show_bug.cgi?id=394078 -->
+	<!-- "core.bigFileThreshold -->
+	<!-- Files larger than this size are stored deflated, without -->
+	<!-- attempting delta compression.  Storing large files without -->
+	<!-- delta compression avoids excessive memory usage, at the -->
+	<!-- slight expense of increased disk usage. -->
+	<!-- Default is 512 MiB on all platforms. -->
+	<!-- This should be reasonable for most projects as source code and other -->
+	<!-- text files can still be delta compressed, -->
+	<!-- but larger binary media files won't be." -->
+	<!-- -- Git documentation -->
+	<!-- If streamFileTreshold < bigFileTreshold you _may_ spend alot of time waiting -->
+	<!-- for push and/or fetch to complete.  It may even look hung. -->
+	<!-- Until the issue is resolved gracefully, a workaround is to configure -->
+	<!-- bigFileThreshold < streamFileTreshold AND then repack the repository. -->
+	<!-- e.g. from the repository folder with Gitblit NOT running: -->
+	<!-- git config core.bigFileTreshold 40m -->
+	<!-- git gc --aggressive -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.streamFileThreshold</param-name>
+		<param-value>50m</param-value>
+	</context-param>
+
+	<!-- When true, JGit will use mmap() rather than malloc()+read() to load data from -->
+	<!-- pack files.  The use of mmap can be problematic on some JVMs as the garbage -->
+	<!-- collector must deduce that a memory mapped segment is no longer in use before -->
+	<!-- a call to munmap() can be made by the JVM native code. -->
+	<!-- In server applications (such as Gitblit) that need to access many pack files, -->
+	<!-- setting this to true risks artificially running out of virtual address space, -->
+	<!-- as the garbage collector cannot reclaim unused mapped spaces fast enough. -->
+	<!-- Default on JGit is false. Although potentially slower, it yields much more -->
+	<!-- predictable behavior. -->
+	<!-- Documentation courtesy of the Gerrit project. -->
+	<!-- SINCE 1.0.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>git.packedGitMmap</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Validate all received (pushed) objects are valid. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.checkReceivedObjects</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Validate all referenced but not supplied objects are reachable. -->
+	<!-- If enabled, Gitblit will verify that references to objects not contained -->
+	<!-- within the received pack are already reachable through at least one other -->
+	<!-- reference advertised to clients. -->
+	<!-- This feature is useful when Gitblit doesn't trust the client to not provide a -->
+	<!-- forged SHA-1 reference to an object, in an attempt to access parts of the DAG -->
+	<!-- that they aren't allowed to see and which have been hidden from them via the -->
+	<!-- configured AdvertiseRefsHook or RefFilter. -->
+	<!-- Enabling this feature may imply at least some, if not all, of the same functionality -->
+	<!-- performed by git.checkReceivedObjects. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.checkReferencedObjectsAreReachable</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Set the maximum allowed Git object size. -->
+	<!-- If an object is larger than the given size the pack-parsing will throw an exception -->
+	<!-- aborting the receive-pack operation.  The default value, 0, disables maximum -->
+	<!-- object size checking. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.maxObjectSizeLimit</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- Set the maximum allowed pack size. -->
+	<!-- A pack exceeding this size will be rejected. The default value, -1, disables -->
+	<!-- maximum pack size checking. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>git.maxPackSizeLimit</param-name>
+		<param-value>-1</param-value>
+	</context-param>
+
+	<!-- Use the Gitblit patch receive pack for processing contributions and tickets. -->
+	<!-- This allows the user to push a patch using the familiar Gerrit syntax: -->
+	<!-- git push <remote> HEAD:refs/for/<targetBranch> -->
+	<!-- NOTE: -->
+	<!-- This requires git.enableGitServlet = true AND it requires an authenticated -->
+	<!-- git transport connection (http/https) when pushing from a client. -->
+	<!-- Valid services include: -->
+	<!-- com.gitblit.tickets.FileTicketService -->
+	<!-- com.gitblit.tickets.BranchTicketService -->
+	<!-- com.gitblit.tickets.RedisTicketService -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>tickets.service</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Globally enable or disable creation of new bug, enhancement, task, etc tickets -->
+	<!-- for all repositories. -->
+	<!-- If false, no tickets can be created through the ui for any repositories. -->
+	<!-- If true, each repository can control if they allow new tickets to be created. -->
+	<!-- NOTE: -->
+	<!-- If a repository is accepting patchsets, new proposal tickets can be created -->
+	<!-- regardless of this setting. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>tickets.acceptNewTickets</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Globally enable or disable pushing patchsets to all repositories. -->
+	<!-- If false, no patchsets will be accepted for any repositories. -->
+	<!-- If true, each repository can control if they accept new patchsets. -->
+	<!-- NOTE: -->
+	<!-- If a repository is accepting patchsets, new proposal tickets can be created -->
+	<!-- regardless of the acceptNewTickets setting. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>tickets.acceptNewPatchsets</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Default setting to control patchset merge through the web ui.  If true, patchsets -->
+	<!-- must have an approval score to enable the merge button.  This setting can be -->
+	<!-- overriden per-repository. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>tickets.requireApproval</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- The case-insensitive regular expression used to identify and close tickets on -->
+	<!-- push to the integration branch for commits that are NOT already referenced as -->
+	<!-- a patchset tip. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>tickets.closeOnPushCommitMessageRegex</param-name>
+		<param-value>(?:fixes|closes)[\\s-]+#?(\\d+)</param-value>
+	</context-param>
+
+	<!-- Specify the location of the Lucene Ticket index -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>tickets.indexFolder</param-name>
+		<param-value>${baseFolder}/tickets/lucene</param-value>
+	</context-param>
+
+	<!-- Define the url for the Redis server. -->
+	<!-- e.g. redis://localhost:6379 -->
+	<!-- redis://:foobared@localhost:6379/2 -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>tickets.redis.url</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- The number of tickets to display on a page. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>tickets.perPage</param-name>
+		<param-value>25</param-value>
+	</context-param>
+
+	<!-- The folder where plugins are loaded from. -->
+	<!-- SINCE 1.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>plugins.folder</param-name>
+		<param-value>${baseFolder}/plugins</param-value>
+	</context-param>
+
+	<!-- The registry of available plugins. -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>plugins.registry</param-name>
+		<param-value>http://plugins.gitblit.com/plugins.json</param-value>
+	</context-param>
+
+	<!-- Location of Groovy scripts to use for Pre and Post receive hooks. -->
+	<!-- Use forward slashes even on Windows!! -->
+	<!-- e.g. c:/groovy -->
+	<!-- RESTART REQUIRED -->
+	<!-- SINCE 0.8.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>groovy.scriptsFolder</param-name>
+		<param-value>${baseFolder}/groovy</param-value>
+	</context-param>
+
+	<!-- Specify the directory Grape uses for downloading libraries. -->
+	<!-- http://groovy.codehaus.org/Grape -->
+	<!-- RESTART REQUIRED -->
+	<!-- SINCE 1.0.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>groovy.grapeFolder</param-name>
+		<param-value>${baseFolder}/groovy/grape</param-value>
+	</context-param>
+
+	<!-- Scripts to execute on Pre-Receive. -->
+	<!-- These scripts execute after an incoming push has been parsed and validated -->
+	<!-- but BEFORE the changes are applied to the repository.  You might reject a -->
+	<!-- push in this script based on the repository and branch the push is attempting -->
+	<!-- to change. -->
+	<!-- Script names are case-sensitive on case-sensitive file systems.  You may omit -->
+	<!-- the traditional ".groovy" from this list if your file extension is ".groovy" -->
+	<!-- NOTE: -->
+	<!-- These scripts are only executed when pushing to *Gitblit*, not to other Git -->
+	<!-- tooling you may be using.  Also note that these scripts are shared between -->
+	<!-- repositories. These are NOT repository-specific scripts!  Within the script -->
+	<!-- you may customize the control-flow for a specific repository by checking the -->
+	<!-- *repository* variable. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>groovy.preReceiveScripts</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Scripts to execute on Post-Receive. -->
+	<!-- These scripts execute AFTER an incoming push has been applied to a repository. -->
+	<!-- You might trigger a continuous-integration build here or send a notification. -->
+	<!-- Script names are case-sensitive on case-sensitive file systems.  You may omit -->
+	<!-- the traditional ".groovy" from this list if your file extension is ".groovy" -->
+	<!-- NOTE: -->
+	<!-- These scripts are only executed when pushing to *Gitblit*, not to other Git -->
+	<!-- tooling you may be using.  Also note that these scripts are shared between -->
+	<!-- repositories. These are NOT repository-specific scripts!  Within the script -->
+	<!-- you may customize the control-flow for a specific repository by checking the -->
+	<!-- *repository* variable. -->
+	<!--  -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>groovy.postReceiveScripts</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Repository custom fields for Groovy Hook mechanism -->
+	<!-- List of key=label pairs of custom fields to prompt for in the Edit Repository -->
+	<!-- page.  These keys are stored in the repository's git config file in the -->
+	<!-- section [gitblit "customFields"].  Key names are alphanumeric only.  These -->
+	<!-- fields are intended to be used for the Groovy hook mechanism where a script -->
+	<!-- can adjust it's execution based on the custom fields stored in the repository -->
+	<!-- config. -->
+	<!-- e.g. "commitMsgRegex=Commit Message Regular Expression" anotherProperty=Another -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>groovy.customFields</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Specify the interface for Fanout to bind it's service. -->
+	<!-- You may specify an ip or an empty value to bind to all interfaces. -->
+	<!-- Specifying localhost will result in Gitblit ONLY listening to requests to -->
+	<!-- localhost. -->
+	<!-- SINCE 1.2.1 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>fanout.bindInterface</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- port for serving the Fanout PubSub service.  <= 0 disables this service. -->
+	<!-- On Unix/Linux systems, ports < 1024 require root permissions. -->
+	<!-- Recommended value: 17000 -->
+	<!-- SINCE 1.2.1 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>fanout.port</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- Use Fanout NIO service.  If false, a multi-threaded socket service will be used. -->
+	<!-- Be advised, the socket implementation spawns a thread per connection plus the -->
+	<!-- connection acceptor thread.  The NIO implementation is completely single-threaded. -->
+	<!-- SINCE 1.2.1 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>fanout.useNio</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Concurrent connection limit.  <= 0 disables concurrent connection throttling. -->
+	<!-- If > 0, only the specified number of concurrent connections will be allowed -->
+	<!-- and all other connections will be rejected. -->
+	<!-- SINCE 1.2.1 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>fanout.connectionLimit</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- Require authentication to see everything but the admin pages -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.authenticateViewPages</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- If web.authenticateViewPages=true you may optionally require a client-side -->
+	<!-- basic authentication prompt instead of the standard form-based login. -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.enforceHttpBasicAuthentication</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Require admin authentication for the admin functions and pages -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.authenticateAdminPages</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allow Gitblit to store a cookie in the user's browser for automatic -->
+	<!-- authentication.  The cookie is generated by the user service. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.allowCookieAuthentication</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Config file for storing project metadata -->
+	<!-- SINCE 1.2.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.projectsFile</param-name>
+		<param-value>${baseFolder}/projects.conf</param-value>
+	</context-param>
+
+	<!-- Either the full path to a user config file (users.conf) -->
+	<!-- OR a fully qualified class name that implements the IUserService interface. -->
+	<!-- Any custom user service implementation must have a public default constructor. -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>realm.userService</param-name>
+		<param-value>${baseFolder}/users.conf</param-value>
+	</context-param>
+
+	<!-- e.g. realm.authenticationProviders = htpasswd windows -->
+	<!-- SINCE 1.4.0 -->
+	<!-- RESTART REQUIRED -->
+	<!-- SPACE-DELIMITED -->
+	<context-param>
+		<param-name>realm.authenticationProviders</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- How to store passwords. -->
+	<!-- Valid values are plain, md5, or combined-md5.  md5 is the hash of password. -->
+	<!-- combined-md5 is the hash of username.toLowerCase()+password. -->
+	<!-- Default is md5. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>realm.passwordStorage</param-name>
+		<param-value>md5</param-value>
+	</context-param>
+
+	<!-- Minimum valid length for a plain text password. -->
+	<!-- Default value is 5.  Absolute minimum is 4. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>realm.minPasswordLength</param-name>
+		<param-value>5</param-value>
+	</context-param>
+
+	<!-- Gitblit Web Settings -->
+	<!-- If blank Gitblit is displayed. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.siteName</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- The canonical url of your Gitblit server to bs used in email notifications. -->
+	<!-- e.g. web.canonicalUrl = https://demo-gitblit.rhcloud.com -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.canonicalUrl</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a different logo image for the header but it must be 120x45px. -->
+	<!-- If the specified file does not exist, the default Gitblit logo will be used. -->
+	<!-- SINCE 1.3.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.headerLogo</param-name>
+		<param-value>${baseFolder}/logo.png</param-value>
+	</context-param>
+
+	<!-- You may specify a different link URL for the logo image anchor. -->
+	<!-- If blank the Gitblit main page URL is used. -->
+	<!-- SINCE 1.3.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.rootLink</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a custom header background CSS color.  If unspecified, the -->
+	<!-- default color will be used. -->
+	<!-- e.g. web.headerBackgroundColor = #002060 -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.headerBackgroundColor</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a custom header foreground CSS color.  If unspecified, the -->
+	<!-- default color will be used. -->
+	<!-- e.g. web.headerForegroundColor = white -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.headerForegroundColor</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a custom header foreground hover CSS color.  If unspecified, the -->
+	<!-- default color will be used. -->
+	<!-- e.g. web.headerHoverColor = white -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.headerHoverColor</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a custom header border CSS color.  If unspecified, the default -->
+	<!-- color will be used. -->
+	<!-- e.g. web.headerBorderColor = #002060 -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.headerBorderColor</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- You may specify a custom header border CSS color.  If unspecified, the default -->
+	<!-- color will be used. -->
+	<!-- e.g. web.headerBorderFocusColor = #ff9900 -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.headerBorderFocusColor</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- If *web.authenticateAdminPages*=true, users with "admin" role can create -->
+	<!-- repositories, create users, and edit repository metadata. -->
+	<!-- If *web.authenticateAdminPages*=false, any user can execute the aforementioned -->
+	<!-- functions. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.allowAdministration</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Setting to disable rendering the top-level navigation header which includes -->
+	<!-- the login form, top-level links like dashboard, repositories, search, etc. -->
+	<!-- This setting is only useful if you plan to embed Gitblit within another page -->
+	<!-- or system. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.hideHeader</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Allows rpc clients to list repositories and possibly manage or administer the -->
+	<!-- Gitblit server, if the authenticated account has administrator permissions. -->
+	<!-- See *web.enableRpcManagement* and *web.enableRpcAdministration*. -->
+	<!-- SINCE 0.7.0 -->
+	<context-param>
+		<param-name>web.enableRpcServlet</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allows rpc clients to manage repositories and users of the Gitblit instance, -->
+	<!-- if the authenticated account has administrator permissions. -->
+	<!-- Requires *web.enableRpcServlet=true*. -->
+	<!-- SINCE 0.7.0 -->
+	<context-param>
+		<param-name>web.enableRpcManagement</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allows rpc clients to control the server settings and monitor the health of this -->
+	<!-- this Gitblit instance, if the authenticated account has administrator permissions. -->
+	<!-- Requires *web.enableRpcServlet=true* and *web.enableRpcManagement*. -->
+	<!-- SINCE 0.7.0 -->
+	<context-param>
+		<param-name>web.enableRpcAdministration</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Full path to a configurable robots.txt file.  With this file you can control -->
+	<!-- what parts of your Gitblit server respectable robots are allowed to traverse. -->
+	<!-- http://googlewebmastercentral.blogspot.com/2008/06/improving-on-robots-exclusion-protocol.html -->
+	<!-- SINCE 1.0.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.robots.txt</param-name>
+		<param-value>${baseFolder}/robots.txt</param-value>
+	</context-param>
+
+	<!-- The number of minutes to cache a page in the browser since the last request. -->
+	<!-- The default value is 0 minutes.  A value <= 0 disables all page caching which -->
+	<!-- is the default behavior for Gitblit <= 1.3.0. -->
+	<!-- SINCE 1.3.1 -->
+	<context-param>
+		<param-name>web.pageCacheExpires</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- If true, the web ui layout will respond and adapt to the browser's dimensions. -->
+	<!-- if false, the web ui will use a 940px fixed-width layout. -->
+	<!-- http://twitter.github.com/bootstrap/scaffolding.html#responsive -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>web.useResponsiveLayout</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allow Gravatar images to be displayed in Gitblit pages. -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.allowGravatar</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allow dynamic zip downloads. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.allowZipDownloads</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- If *web.allowZipDownloads=true* the following formats will be displayed for -->
+	<!-- download compressed archive links: -->
+	<!-- zip   = standard .zip -->
+	<!-- tar   = standard tar format (preserves *nix permissions and symlinks) -->
+	<!-- gz    = gz-compressed tar -->
+	<!-- xz    = xz-compressed tar -->
+	<!-- bzip2 = bzip2-compressed tar -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>web.compressedDownloads</param-name>
+		<param-value>zip gz</param-value>
+	</context-param>
+
+	<!-- Allow optional Lucene integration. Lucene indexing is an opt-in feature. -->
+	<!-- A repository may specify branches to index with Lucene instead of using Git -->
+	<!-- commit traversal. There are scenarios where you may want to completely disable -->
+	<!-- Lucene indexing despite a repository specifying indexed branches.  One such -->
+	<!-- scenario is on a resource-constrained federated Gitblit mirror. -->
+	<!-- SINCE 0.9.0 -->
+	<context-param>
+		<param-name>web.allowLuceneIndexing</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Allows an authenticated user to create forks of a repository -->
+	<!-- set this to false if you want to disable all fork controls on the web site -->
+	<context-param>
+		<param-name>web.allowForking</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Controls the length of shortened commit hash ids -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>web.shortCommitIdLength</param-name>
+		<param-value>6</param-value>
+	</context-param>
+
+	<!-- Use Clippy (Flash solution) to provide a copy-to-clipboard button. -->
+	<!-- If false, a button with a more primitive JavaScript-based prompt box will -->
+	<!-- offer a 3-step (click, ctrl+c, enter) copy-to-clipboard alternative. -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.allowFlashCopyToClipboard</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Default maximum number of commits that a repository may contribute to the -->
+	<!-- activity page, regardless of the selected duration.  This setting may be valuable -->
+	<!-- for an extremely busy server.  This value may also be configed per-repository -->
+	<!-- in Edit Repository. 0 disables this throttle. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>web.maxActivityCommits</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- Default number of entries to include in RSS Syndication links -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.syndicationEntries</param-name>
+		<param-value>25</param-value>
+	</context-param>
+
+	<!-- Show the size of each repository on the repositories page. -->
+	<!-- This requires recursive traversal of each repository folder.  This may be -->
+	<!-- non-performant on some operating systems and/or filesystems. -->
+	<!-- SINCE 0.5.2 -->
+	<context-param>
+		<param-name>web.showRepositorySizes</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- List of custom regex expressions that can be displayed in the Filters menu -->
+	<!-- of the Repositories and Activity pages.  Keep them very simple because you -->
+	<!-- are likely to run into encoding issues if they are too complex. -->
+	<!-- Use !!! to separate the filters -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.customFilters</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Show federation registrations (without token) and the current pull status -->
+	<!-- to non-administrator users. -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>web.showFederationRegistrations</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- This is the message displayed when *web.authenticateViewPages=true*. -->
+	<!-- This can point to a file with Markdown content. -->
+	<!-- Specifying "gitblit" uses the internal login message. -->
+	<!-- SINCE 0.7.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.loginMessage</param-name>
+		<param-value>gitblit</param-value>
+	</context-param>
+
+	<!-- This is the message displayed above the repositories table. -->
+	<!-- This can point to a file with Markdown content. -->
+	<!-- Specifying "gitblit" uses the internal welcome message. -->
+	<!-- SINCE 0.5.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>web.repositoriesMessage</param-name>
+		<param-value>gitblit</param-value>
+	</context-param>
+
+	<!-- Ordered list of charsets/encodings to use when trying to display a blob. -->
+	<!-- If empty, UTF-8 and ISO-8859-1 are used.  The server's default charset -->
+	<!-- is always appended to the encoding list.  If all encodings fail to cleanly -->
+	<!-- decode the blob content, UTF-8 will be used with the standard malformed -->
+	<!-- input/unmappable character replacement strings. -->
+	<!--  -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>web.blobEncodings</param-name>
+		<param-value>UTF-8 ISO-8859-1</param-value>
+	</context-param>
+
+	<!-- Manually set the default timezone to be used by Gitblit for display in the -->
+	<!-- web ui.  This value is independent of the JVM timezone.  Specifying a blank -->
+	<!-- value will default to the JVM timezone. -->
+	<!-- e.g. America/New_York, US/Pacific, UTC, Europe/Berlin -->
+	<!-- SINCE 0.9.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.timezone</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Use the client timezone when formatting dates. -->
+	<!-- This uses AJAX to determine the browser's timezone and may require more -->
+	<!-- server overhead because a Wicket session is created.  All Gitblit pages -->
+	<!-- attempt to be stateless, if possible. -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.useClientTimezone</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Time format -->
+	<!-- <http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html> -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.timeFormat</param-name>
+		<param-value>HH:mm</param-value>
+	</context-param>
+
+	<!-- Short date format -->
+	<!-- <http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html> -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.datestampShortFormat</param-name>
+		<param-value>yyyy-MM-dd</param-value>
+	</context-param>
+
+	<!-- Long date format -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.datestampLongFormat</param-name>
+		<param-value>EEEE, MMMM d, yyyy</param-value>
+	</context-param>
+
+	<!-- Long timestamp format -->
+	<!-- <http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html> -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.datetimestampLongFormat</param-name>
+		<param-value>EEEE, MMMM d, yyyy HH:mm Z</param-value>
+	</context-param>
+
+	<!-- Mount URL parameters -->
+	<!-- This setting controls if pretty or parameter URLs are used. -->
+	<!-- i.e. -->
+	<!-- if true: -->
+	<!-- http://localhost/commit/myrepo/abcdef -->
+	<!-- if false: -->
+	<!-- http://localhost/commit/?r=myrepo&h=abcdef -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.mountParameters</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Some servlet containers (e.g. Tomcat >= 6.0.10) disallow '/' (%2F) encoding -->
+	<!-- in URLs as a security precaution for proxies.  This setting tells Gitblit -->
+	<!-- to preemptively replace '/' with '*' or '!' for url string parameters. -->
+	<!-- <https://issues.apache.org/jira/browse/WICKET-1303> -->
+	<!-- <http://tomcat.apache.org/security-6.html#Fixed_in_Apache_Tomcat_6.0.10> -->
+	<!-- Add *-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true* to your -->
+	<!-- *CATALINA_OPTS* or to your JVM launch parameters -->
+	<!-- SINCE 0.5.2 -->
+	<context-param>
+		<param-name>web.forwardSlashCharacter</param-name>
+		<param-value>!</param-value>
+	</context-param>
+
+	<!-- Show other URLs on the summary page for accessing your git repositories -->
+	<!-- Use spaces to separate urls. -->
+	<!-- {0} is the token for the repository name -->
+	<!-- {1} is the token for the username -->
+	<!-- The username is only practical if you have setup your other git serving -->
+	<!-- solutions accounts to have the same username as the Gitblit account. -->
+	<!-- e.g. -->
+	<!-- web.otherUrls = ssh://localhost/git/{0} git://localhost/git/{0} https://{1}@localhost/r/{0} -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.otherUrls</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Should app-specific clone links be displayed for SourceTree, SparkleShare, etc? -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.allowAppCloneLinks</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Choose how to present the repositories list. -->
+	<!-- grouped = group nested/subfolder repositories together (no sorting) -->
+	<!-- flat = flat list of repositories (sorting allowed) -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.repositoryListType</param-name>
+		<param-value>grouped</param-value>
+	</context-param>
+
+	<!-- If using a grouped repository list and there are repositories at the -->
+	<!-- root level of your repositories folder, you may specify the displayed -->
+	<!-- group name with this setting.  This value is only used for web presentation. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.repositoryRootGroupName</param-name>
+		<param-value>main</param-value>
+	</context-param>
+
+	<!-- Display the repository swatch color next to the repository name link in the -->
+	<!-- repositories list. -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.repositoryListSwatches</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Defines the default commit message renderer.  This can be configured -->
+	<!-- per-repository. -->
+	<!-- Valid values are: plain, markdown -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.commitMessageRenderer</param-name>
+		<param-value>plain</param-value>
+	</context-param>
+
+	<!-- Control if email addresses are shown in web ui -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.showEmailAddresses</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Shows a combobox in the page links header with commit, committer, and author -->
+	<!-- search selection.  Default search is commit. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.showSearchTypeSelection</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Controls display of activity graphs on the dashboard, activity, and summary -->
+	<!-- pages.  Charting makes use of the external Google Charts API. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.generateActivityGraph</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Displays the commits branch graph in the summary page and commits/log page. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.showBranchGraph</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- The default number of days to show on the activity page. -->
+	<!-- Value must exceed 0 else default of 7 is used -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>web.activityDuration</param-name>
+		<param-value>7</param-value>
+	</context-param>
+
+	<!-- Choices for days of activity to display. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.activityDurationChoices</param-name>
+		<param-value>1 3 7 14 21 28</param-value>
+	</context-param>
+
+	<!-- Maximum number of days of activity that may be displayed on the activity page. -->
+	<!-- SINCE 1.3.2 -->
+	<context-param>
+		<param-name>web.activityDurationMaximum</param-name>
+		<param-value>30</param-value>
+	</context-param>
+
+	<!-- The number of days of commits to cache in memory for the dashboard, activity, -->
+	<!-- and project pages.  A value of 0 will disable all caching and will parse commits -->
+	<!-- in each repository per-request.  If the value > 0 these pages will try to fulfill -->
+	<!-- requests using the commit cache.  If the request specifies a period which falls -->
+	<!-- outside the commit cache window, then the cache will be ignored and the request -->
+	<!-- will be fulfilled by brute-force parsing all relevant commits per-repository. -->
+	<!-- Consider the values specified for *web.activityDurationChoices* when setting -->
+	<!-- the cache size AND consider adjusting the JVM -Xmx heap parameter appropriately. -->
+	<!-- SINCE 1.3.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.activityCacheDays</param-name>
+		<param-value>14</param-value>
+	</context-param>
+
+	<!-- Case-insensitive list of authors to exclude from metrics.  Useful for -->
+	<!-- eliminating bots. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.metricAuthorExclusions</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- The number of commits to display on the summary page -->
+	<!-- Value must exceed 0 else default of 20 is used -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.summaryCommitCount</param-name>
+		<param-value>16</param-value>
+	</context-param>
+
+	<!-- The number of tags/branches to display on the summary page. -->
+	<!-- -1 = all tags/branches -->
+	<!-- 0 = hide tags/branches -->
+	<!-- N = N tags/branches -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.summaryRefsCount</param-name>
+		<param-value>5</param-value>
+	</context-param>
+
+	<!-- Show a README file, if available, on the summary page. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.summaryShowReadme</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- The number of items to show on a page before showing the first, prev, next -->
+	<!-- pagination links.  A default of 50 is used for any invalid value. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.itemsPerPage</param-name>
+		<param-value>50</param-value>
+	</context-param>
+
+	<!-- The number of reflog changes to display on the overview page -->
+	<!-- Value must exceed 0 else default of 5 is used -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.overviewReflogCount</param-name>
+		<param-value>5</param-value>
+	</context-param>
+
+	<!-- The number of reflog changes to show on a reflog page before show the first, -->
+	<!-- prev, next pagination links.  A default of 10 is used for any invalid value. -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.reflogChangesPerPage</param-name>
+		<param-value>10</param-value>
+	</context-param>
+
+	<!-- Specify the names of documents in the root of your repository to be displayed -->
+	<!-- in tabs on your repository docs page.  If the name is not found in the root -->
+	<!-- then no tab is added.  The order specified is the order displayed.  Do not -->
+	<!-- specify a file extension as the aggregation of markup extensions + txt are used -->
+	<!-- in the search algorithm. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.documents</param-name>
+		<param-value>readme home index changelog contributing submitting_patches copying license notice authors</param-value>
+	</context-param>
+
+	<!-- Registered file extensions to ignore during Lucene indexing -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.9.0 -->
+	<context-param>
+		<param-name>web.luceneIgnoreExtensions</param-name>
+		<param-value>7z arc arj bin bmp dll doc docx exe gif gz jar jpg lib lzh odg odf odt pdf ppt pptx png so swf tar xcf xls xlsx zip</param-value>
+	</context-param>
+
+	<!-- Registered extensions for google-code-prettify -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.prettyPrintExtensions</param-name>
+		<param-value>aea agc basic c cbm cl clj cpp cs css dart el erl erlang frm fs go groovy hs htm html java js latex lisp ll llvm lsp lua ml moxie mumps n nemerle pascal php pl prefs properties proto py r R rb rd Rd rkt s S scala scm sh Splus sql ss tcl tex vb vbs vhd vhdl wiki xml xq xquery yaml yml ymlapollo</param-value>
+	</context-param>
+
+	<!-- Registered extensions for markdown transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.markdownExtensions</param-name>
+		<param-value>md mkd markdown MD MKD</param-value>
+	</context-param>
+
+	<!-- Registered extensions for mediawiki transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.mediawikiExtensions</param-name>
+		<param-value>mw mediawiki</param-value>
+	</context-param>
+
+	<!-- Registered extensions for twiki transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.twikiExtensions</param-name>
+		<param-value>twiki</param-value>
+	</context-param>
+
+	<!-- Registered extensions for textile transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.textileExtensions</param-name>
+		<param-value>textile</param-value>
+	</context-param>
+
+	<!-- Registered extensions for confluence transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.confluenceExtensions</param-name>
+		<param-value>confluence</param-value>
+	</context-param>
+
+	<!-- Registered extensions for tracwiki transformation -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>web.tracwikiExtensions</param-name>
+		<param-value>tracwiki</param-value>
+	</context-param>
+
+	<!-- Image extensions -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.imageExtensions</param-name>
+		<param-value>bmp jpg gif png</param-value>
+	</context-param>
+
+	<!-- Registered extensions for binary blobs -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.binaryExtensions</param-name>
+		<param-value>7z arc arj bin dll doc docx exe gz jar lib lzh odg odf odt pdf ppt pptx so tar xls xlsx zip</param-value>
+	</context-param>
+
+	<!-- Aggressive heap management will run the garbage collector on every generated -->
+	<!-- page.  This slows down page generation a little but improves heap consumption. -->
+	<!-- SINCE 0.5.0 -->
+	<context-param>
+		<param-name>web.aggressiveHeapManagement</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Run the webapp in debug mode -->
+	<!-- SINCE 0.5.0 -->
+	<!-- RESTART REQUIRED -->
+	<context-param>
+		<param-name>web.debugMode</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Force a default locale for all users, ignoring the browser's settings. -->
+	<!-- An empty value allows Gitblit to use the translation preferred by the browser. -->
+	<!-- Changing this value while the server is running will only affect new sessions. -->
+	<!-- e.g. web.forceDefaultLocale = en -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>web.forceDefaultLocale</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Enable/disable global regex substitutions (i.e. shared across repositories) -->
+	<!-- SINCE 0.5.0 -->
+	<!-- DEPRECATED 1.4.0 (migrate to bugtraq instead) -->
+	<context-param>
+		<param-name>regex.global</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- ip or hostname of smtp server -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.server</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- port to use for smtp requests -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.port</param-name>
+		<param-value>25</param-value>
+	</context-param>
+
+	<!-- debug the mail executor -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.debug</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- use SMTPs flag -->
+	<context-param>
+		<param-name>mail.smtps</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- if your smtp server requires authentication, supply the credentials here -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.username</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.password</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- from address for generated emails -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.fromAddress</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- List of email addresses for the Gitblit administrators -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>mail.adminAddresses</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- List of email addresses for sending push email notifications. -->
+	<!-- This key currently requires use of the sendemail.groovy hook script. -->
+	<!-- If you set sendemail.groovy in *groovy.postReceiveScripts* then email -->
+	<!-- notifications for all repositories (regardless of access restrictions!) -->
+	<!-- will be sent to these addresses. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 0.8.0 -->
+	<context-param>
+		<param-name>mail.mailingLists</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Your federation name is used for federation status acknowledgments.  If it is -->
+	<!-- unset, and you elect to send a status acknowledgment, your Gitblit instance -->
+	<!-- will be identified by its hostname, if available, else your internal ip address. -->
+	<!-- The source Gitblit instance will also append your external IP address to your -->
+	<!-- identification to differentiate multiple pulling systems behind a single proxy. -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>federation.name</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Specify the passphrase of this Gitblit instance. -->
+	<!-- An unspecified (empty) passphrase disables processing federation requests. -->
+	<!-- This value can be anything you want: an integer, a sentence, an haiku, etc. -->
+	<!-- Keep the value simple, though, to avoid Java properties file encoding issues. -->
+	<!-- Changing your passphrase will break any registrations you have established with other -->
+	<!-- Gitblit instances. -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 0.6.0 -->
+	<!-- RESTART REQUIRED *(only to enable or disable federation)* -->
+	<context-param>
+		<param-name>federation.passphrase</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Control whether or not this Gitblit instance can receive federation proposals -->
+	<!-- from another Gitblit instance.  Registering a federated Gitblit is a manual -->
+	<!-- process.  Proposals help to simplify that process by allowing a remote Gitblit -->
+	<!-- instance to send your Gitblit instance the federation pull data. -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>federation.allowProposals</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- The destination folder for cached federation proposals. -->
+	<!-- Use forward slashes even on Windows!! -->
+	<!-- SINCE 0.6.0 -->
+	<!-- BASEFOLDER -->
+	<context-param>
+		<param-name>federation.proposalsFolder</param-name>
+		<param-value>${baseFolder}/proposals</param-value>
+	</context-param>
+
+	<!-- The default pull frequency if frequency is unspecified on a registration -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>federation.defaultFrequency</param-name>
+		<param-value>60 mins</param-value>
+	</context-param>
+
+	<!-- Federation Sets are named groups of repositories.  The Federation Sets are -->
+	<!-- available for selection in the repository settings page.  You can assign a -->
+	<!-- repository to one or more sets and then distribute the token for the set. -->
+	<!-- This allows you to grant federation pull access to a subset of your available -->
+	<!-- repositories.  Tokens for federation sets only grant repository pull access. -->
+	<!-- SPACE-DELIMITED -->
+	<!-- CASE-SENSITIVE -->
+	<!-- SINCE 0.6.0 -->
+	<context-param>
+		<param-name>federation.sets</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Auto-creates user accounts based on the servlet container principal.  This -->
+	<!-- assumes that your Gitblit install is a protected resource and your container's -->
+	<!-- authentication process intercepts all Gitblit requests. -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>realm.container.autoCreateAccounts</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Allow or prohibit Windows guest account logins -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>realm.windows.allowGuests</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Allow user accounts belonging to the BUILTIN\Administrators group to be -->
+	<!-- Gitblit administrators. -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>realm.windows.permitBuiltInAdministrators</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- The default domain for authentication. -->
+	<!-- If specified, this domain will be used for authentication UNLESS the supplied -->
+	<!-- login name manually specifies a domain (.e.g. mydomain\james or james@mydomain) -->
+	<!-- If unspecified, the username must be specified in UPN format (name@domain). -->
+	<!-- if "." (dot) is specified, ONLY the local account database will be used. -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>realm.windows.defaultDomain</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- The PAM service name for authentication. -->
+	<!-- default: system-auth -->
+	<!-- SINCE 1.3.1 -->
+	<context-param>
+		<param-name>realm.pam.serviceName</param-name>
+		<param-value>system-auth</param-value>
+	</context-param>
+
+	<!-- The Apache htpasswd file that contains the users and passwords. -->
+	<!-- default: ${baseFolder}/htpasswd -->
+	<!-- RESTART REQUIRED -->
+	<!-- BASEFOLDER -->
+	<!-- SINCE 1.3.2 -->
+	<context-param>
+		<param-name>realm.htpasswd.userfile</param-name>
+		<param-value>${baseFolder}/htpasswd</param-value>
+	</context-param>
+
+	<!-- Restrict the Salesforce user to members of this org. -->
+	<!-- default: 0 (i.e. do not check the Org ID) -->
+	<!-- SINCE 1.3.0 -->
+	<context-param>
+		<param-name>realm.salesforce.orgId</param-name>
+		<param-value>0</param-value>
+	</context-param>
+
+	<!-- URL of the LDAP server. -->
+	<!-- To use encrypted transport, use either ldaps:// URL for SSL or ldap+tls:// to -->
+	<!-- send StartTLS command. -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.server</param-name>
+		<param-value>ldap://localhost</param-value>
+	</context-param>
+
+	<!-- Login username for LDAP searches. -->
+	<!-- If this value is unspecified, anonymous LDAP login will be used. -->
+	<!--  -->
+	<!-- e.g. mydomain\\username -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.username</param-name>
+		<param-value>cn=Directory Manager</param-value>
+	</context-param>
+
+	<!-- Login password for LDAP searches. -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.password</param-name>
+		<param-value>password</param-value>
+	</context-param>
+
+	<!-- Bind pattern for Authentication. -->
+	<!-- Allow to directly authenticate an user without LDAP Searches. -->
+	<!--  -->
+	<!-- e.g. CN=${username},OU=Users,OU=UserControl,OU=MyOrganization,DC=MyDomain -->
+	<!-- SINCE 1.5.0 -->
+	<context-param>
+		<param-name>realm.ldap.bindpattern</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<!-- Delegate team membership control to LDAP. -->
+	<!-- If true, team user memberships will be specified by LDAP groups.  This will -->
+	<!-- disable team selection in Edit User and user selection in Edit Team. -->
+	<!-- If false, LDAP will only be used for authentication and Gitblit will maintain -->
+	<!-- team memberships with the *realm.ldap.backingUserService*. -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.maintainTeams</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- Root node for all LDAP users -->
+	<!-- This is the root node from which subtree user searches will begin. -->
+	<!-- If blank, Gitblit will search ALL nodes. -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.accountBase</param-name>
+		<param-value>OU=Users,OU=UserControl,OU=MyOrganization,DC=MyDomain</param-value>
+	</context-param>
+
+	<!-- Filter criteria for LDAP users -->
+	<!-- Query pattern to use when searching for a user account. This may be any valid -->
+	<!-- LDAP query expression, including the standard (&) and (|) operators. -->
+	<!-- Variables may be injected via the ${variableName} syntax. -->
+	<!-- Recognized variables are: -->
+	<!-- ${username} - The text entered as the user name -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.accountPattern</param-name>
+		<param-value>(&amp;(objectClass=person)(sAMAccountName=${username}))</param-value>
+	</context-param>
+
+	<!-- Root node for all LDAP groups to be used as Gitblit Teams -->
+	<!-- This is the root node from which subtree team searches will begin. -->
+	<!-- If blank, Gitblit will search ALL nodes. -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.groupBase</param-name>
+		<param-value>OU=Groups,OU=UserControl,OU=MyOrganization,DC=MyDomain</param-value>
+	</context-param>
+
+	<!-- Filter criteria for LDAP groups -->
+	<!-- Query pattern to use when searching for a team. This may be any valid -->
+	<!-- LDAP query expression, including the standard (&) and (|) operators. -->
+	<!-- Variables may be injected via the ${variableName} syntax. -->
+	<!-- Recognized variables are: -->
+	<!-- ${username} - The text entered as the user name -->
+	<!-- ${dn} - The Distinguished Name of the user logged in -->
+	<!-- All attributes from the LDAP User record are available. For example, if a user -->
+	<!-- has an attribute "fullName" set to "John", "(fn=${fullName})" will be -->
+	<!-- translated to "(fn=John)". -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.groupMemberPattern</param-name>
+		<param-value>(&amp;(objectClass=group)(member=${dn}))</param-value>
+	</context-param>
+
+	<!-- Filter criteria for empty LDAP groups -->
+	<!-- Query pattern to use when searching for an empty team. This may be any valid -->
+	<!-- LDAP query expression, including the standard (&) and (|) operators. -->
+	<!-- default: (&(objectClass=group)(!(member=*))) -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>realm.ldap.groupEmptyMemberPattern</param-name>
+		<param-value>(&amp;(objectClass=group)(!(member=*)))</param-value>
+	</context-param>
+
+	<!-- LDAP users or groups that should be given administrator privileges. -->
+	<!-- Teams are specified with a leading '@' character.  Groups with spaces in the -->
+	<!-- name can be entered as "@team name".  This setting only applies when using -->
+	<!-- LDAP to maintain team memberships. -->
+	<!-- e.g. realm.ldap.admins = john @git_admins "@git admins" -->
+	<!-- SPACE-DELIMITED -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.admins</param-name>
+		<param-value>@Git_Admins</param-value>
+	</context-param>
+
+	<!-- Attribute(s) on the USER record that indicate their display (or full) name. -->
+	<!-- Leave blank for no mapping available in LDAP. -->
+	<!-- This may be a single attribute, or a string of multiple attributes.  Examples: -->
+	<!-- displayName - Uses the attribute 'displayName' on the user record -->
+	<!-- ${personalTitle}. ${givenName} ${surname} - Will concatenate the 3 -->
+	<!-- attributes together, with a '.' after personalTitle -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.displayName</param-name>
+		<param-value>displayName</param-value>
+	</context-param>
+
+	<!-- Attribute(s) on the USER record that indicate their email address. -->
+	<!-- Leave blank for no mapping available in LDAP. -->
+	<!-- This may be a single attribute, or a string of multiple attributes.  Examples: -->
+	<!-- email - Uses the attribute 'email' on the user record -->
+	<!-- ${givenName}.${surname}@gitblit.com -Will concatenate the 2 attributes -->
+	<!-- together with a '.' and '@' creating something like first.last@gitblit.com -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.email</param-name>
+		<param-value>email</param-value>
+	</context-param>
+
+	<!-- Attribute on the USER record that indicate their username to be used in gitblit -->
+	<!-- when synchronizing users from LDAP -->
+	<!-- if blank, Gitblit will use uid -->
+	<!-- For MS Active Directory this may be sAMAccountName -->
+	<!-- SINCE 1.0.0 -->
+	<context-param>
+		<param-name>realm.ldap.uid</param-name>
+		<param-value>uid</param-value>
+	</context-param>
+
+	<!-- Defines whether to synchronize all LDAP users and teams into the user service -->
+	<!-- Valid values: true, false -->
+	<!-- If left blank, false is assumed -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>realm.ldap.synchronize</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- default: 5 MINUTES -->
+	<!-- RESTART REQUIRED -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>realm.ldap.syncPeriod</param-name>
+		<param-value>5 MINUTES</param-value>
+	</context-param>
+
+	<!-- Defines whether to delete non-existent LDAP users from the user service -->
+	<!-- during synchronization. depends on  realm.ldap.synchronize = true -->
+	<!-- Valid values: true, false -->
+	<!-- If left blank, true is assumed -->
+	<!-- SINCE 1.4.0 -->
+	<context-param>
+		<param-name>realm.ldap.removeDeletedUsers</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- URL of the Redmine. -->
+	<!-- SINCE 1.2.0 -->
+	<context-param>
+		<param-name>realm.redmine.url</param-name>
+		<param-value>http://example.com/redmine</param-value>
+	</context-param>
+ 
+	 
+	 
+<!-- Gitblit Context Listener -->	 
+	<listener>
+ 		<listener-class>com.gitblit.servlet.GitblitContext</listener-class>
+ 	</listener> 	
+	
+	
+	<!-- Git Servlet
+		 <url-pattern> MUST match: 
+			* GitFilter
+			* com.gitblit.Constants.GIT_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>GitServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.GitServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GitServlet</servlet-name>		
+		<url-pattern>/git/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GitServlet</servlet-name>		
+		<url-pattern>/r/*</url-pattern>
+	</servlet-mapping>
+
+	
+	<!-- SparkleShare Invite Servlet
+		 <url-pattern> MUST match: 
+			* com.gitblit.Constants.SPARKLESHARE_INVITE_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>SparkleShareInviteServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.SparkleShareInviteServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SparkleShareInviteServlet</servlet-name>		
+		<url-pattern>/sparkleshare/*</url-pattern>
+	</servlet-mapping>
+
+	
+	<!-- Syndication Servlet
+		 <url-pattern> MUST match: 
+			* SyndicationFilter
+			* com.gitblit.Constants.SYNDICATION_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>SyndicationServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.SyndicationServlet</servlet-class>		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SyndicationServlet</servlet-name>
+		<url-pattern>/feed/*</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- Zip Servlet
+		 <url-pattern> MUST match: 
+			* ZipServlet
+			* com.gitblit.Constants.ZIP_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>ZipServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.DownloadZipServlet</servlet-class>		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ZipServlet</servlet-name>
+		<url-pattern>/zip/*</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- Federation Servlet
+		 <url-pattern> MUST match: 
+		 	* com.gitblit.Constants.FEDERATION_PATH		 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>FederationServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.FederationServlet</servlet-class>		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FederationServlet</servlet-name>
+		<url-pattern>/federation/*</url-pattern>
+	</servlet-mapping>	
+	
+	
+	<!-- Rpc Servlet
+		 <url-pattern> MUST match: 
+		 	* com.gitblit.Constants.RPC_PATH		 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>RpcServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.RpcServlet</servlet-class>		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RpcServlet</servlet-name>
+		<url-pattern>/rpc/*</url-pattern>
+	</servlet-mapping>	
+
+
+	<!-- Pages Servlet
+		 <url-pattern> MUST match: 
+			* PagesFilter
+			* com.gitblit.Constants.PAGES_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>PagesServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.PagesServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PagesServlet</servlet-name>		
+		<url-pattern>/pages/*</url-pattern>
+	</servlet-mapping>	
+
+	
+	<!-- Logo Servlet
+		 <url-pattern> MUST match: 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>LogoServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.LogoServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LogoServlet</servlet-name>		
+		<url-pattern>/logo.png</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- PT Servlet
+		 <url-pattern> MUST match: 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>PtServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.PtServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PtServlet</servlet-name>		
+		<url-pattern>/pt</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- Branch Graph Servlet
+		 <url-pattern> MUST match: 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>BranchGraphServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.BranchGraphServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>BranchGraphServlet</servlet-name>		
+		<url-pattern>/graph/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Robots.txt Servlet
+		 <url-pattern> MUST match: 
+			* Wicket Filter ignorePaths parameter -->
+	<servlet>
+		<servlet-name>RobotsTxtServlet</servlet-name>
+		<servlet-class>com.gitblit.servlet.RobotsTxtServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RobotsTxtServlet</servlet-name>		
+		<url-pattern>/robots.txt</url-pattern>
+	</servlet-mapping>
+
+	<!-- Git Access Restriction Filter
+		 <url-pattern> MUST match: 
+			* GitServlet
+			* com.gitblit.Constants.GIT_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<filter>
+		<filter-name>GitFilter</filter-name>
+		<filter-class>com.gitblit.servlet.GitFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>GitFilter</filter-name>
+		<url-pattern>/git/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>GitFilter</filter-name>
+		<url-pattern>/r/*</url-pattern>
+	</filter-mapping>
+	
+	
+	<!-- Syndication Restriction Filter
+		 <url-pattern> MUST match: 
+			* SyndicationServlet
+			* com.gitblit.Constants.SYNDICATION_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<filter>
+		<filter-name>SyndicationFilter</filter-name>
+		<filter-class>com.gitblit.servlet.SyndicationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>SyndicationFilter</filter-name>
+		<url-pattern>/feed/*</url-pattern>
+	</filter-mapping>
+	
+	
+	<!-- Download Zip Restriction Filter
+		 <url-pattern> MUST match: 
+			* DownloadZipServlet
+			* com.gitblit.Constants.ZIP_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<filter>
+		<filter-name>ZipFilter</filter-name>
+		<filter-class>com.gitblit.servlet.DownloadZipFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>ZipFilter</filter-name>
+		<url-pattern>/zip/*</url-pattern>
+	</filter-mapping>
+
+		
+	<!-- Rpc Restriction Filter
+		 <url-pattern> MUST match: 
+			* RpcServlet
+			* com.gitblit.Constants.RPC_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<filter>
+		<filter-name>RpcFilter</filter-name>
+		<filter-class>com.gitblit.servlet.RpcFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>RpcFilter</filter-name>
+		<url-pattern>/rpc/*</url-pattern>
+	</filter-mapping>
+
+
+	<!-- Pges Restriction Filter
+		 <url-pattern> MUST match: 
+			* PagesServlet
+			* com.gitblit.Constants.PAGES_PATH
+			* Wicket Filter ignorePaths parameter -->
+	<filter>
+		<filter-name>PagesFilter</filter-name>
+		<filter-class>com.gitblit.servlet.PagesFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PagesFilter</filter-name>
+		<url-pattern>/pages/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>EnforceAuthenticationFilter</filter-name>
+		<filter-class>com.gitblit.servlet.EnforceAuthenticationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+        <filter-name>EnforceAuthenticationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+	<!-- Wicket Filter -->
+    <filter>
+        <filter-name>wicketFilter</filter-name>
+        <filter-class>
+            com.gitblit.wicket.GitblitWicketFilter
+        </filter-class>        
+        <init-param>
+            <param-name>ignorePaths</param-name>
+            <!-- Paths should match 
+             	* SyndicationFilter <url-pattern>
+             	* SyndicationServlet <url-pattern>
+             	* com.gitblit.Constants.SYNDICATION_PATH
+             	* GitFilter <url-pattern>
+             	* GitServlet <url-pattern>
+             	* com.gitblit.Constants.GIT_PATH
+             	* SparkleshareInviteServlet <url-pattern>
+             	* com.gitblit.Constants.SPARKLESHARE_INVITE_PATH
+             	* Zipfilter <url-pattern>
+             	* ZipServlet <url-pattern>
+             	* com.gitblit.Constants.ZIP_PATH
+             	* FederationServlet <url-pattern>
+             	* RpcFilter <url-pattern>
+             	* RpcServlet <url-pattern>
+             	* PagesFilter <url-pattern>
+             	* PagesServlet <url-pattern>
+             	* com.gitblit.Constants.PAGES_PATH -->
+            <param-value>r/,git/,pt,feed/,zip/,federation/,rpc/,pages/,robots.txt,logo.png,graph/,sparkleshare/</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>wicketFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+</web-app>
