@@ -387,7 +387,7 @@
 	<!-- repository. -->
 	<!-- Requirements: -->
 	<!-- 1. you must manually clone the repository using native git -->
-	<!-- git clone --mirror git://somewhere.com/myrepo.git -->
+	<!-- git clone mirror git://somewhere.com/myrepo.git -->
 	<!-- 2. the "origin" remote must be the mirror source -->
 	<!-- 3. the "origin" repository must be accessible without authentication OR the -->
 	<!-- credentials must be embedded in the origin url (not recommended) -->
