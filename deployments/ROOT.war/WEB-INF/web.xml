@@ -316,9 +316,9 @@
 
 	<!-- Controls creating a repository as shared on Unix servers. -->
 	<!-- In an Unix environment where mixed access methods exist for shared repositories, -->
-	<!-- the repository should be created with 'git init --shared' to make sure that -->
+	<!-- the repository should be created with 'git init shared' to make sure that -->
 	<!-- it can be accessed e.g. via ssh (user git) and http (user www-data). -->
-	<!-- Valid values are the values available for the '--shared' option. The the manual -->
+	<!-- Valid values are the values available for the 'shared' option. The the manual -->
 	<!-- page for 'git init' for more information on shared repositories. -->
 	<!-- SINCE 1.4.0 -->
 	<context-param>
@@ -503,7 +503,7 @@
 	<!-- bigFileThreshold < streamFileTreshold AND then repack the repository. -->
 	<!-- e.g. from the repository folder with Gitblit NOT running: -->
 	<!-- git config core.bigFileTreshold 40m -->
-	<!-- git gc --aggressive -->
+	<!-- git gc aggressive -->
 	<!-- SINCE 1.0.0 -->
 	<!-- RESTART REQUIRED -->
 	<context-param>
