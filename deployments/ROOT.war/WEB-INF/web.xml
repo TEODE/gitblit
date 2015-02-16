@@ -1235,6 +1235,17 @@
 	<!-- Add *-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true* to your -->
 	<!-- *CATALINA_OPTS* or to your JVM launch parameters -->
 	<!-- SINCE 0.5.2 -->
+
+	<!-- Added by VGI on 16/02/2015 -->
+	<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<user-data-constraint>
+			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
 	<context-param>
 		<param-name>web.forwardSlashCharacter</param-name>
 		<param-value>!</param-value>

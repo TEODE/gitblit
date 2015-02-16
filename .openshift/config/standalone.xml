@@ -491,6 +491,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
             <!--<connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>-->
+            <!-- Added by VGI on 16/02/2015 -->
             <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http" proxy-name="${env.OPENSHIFT_GEAR_DNS}" proxy-port="443" secure="true"/>
             <virtual-server name="default-host" enable-welcome-root="false">
                 <alias name="localhost"/>
@@ -500,6 +501,7 @@
             <modify-wsdl-address>true</modify-wsdl-address>
             <wsdl-host>${env.OPENSHIFT_GEAR_DNS}</wsdl-host>
             <!--<wsdl-port>80</wsdl-port>-->
+            <!-- Added by VGI on 16/02/2015 -->
             <wsdl-port>443</wsdl-port>
             <endpoint-config name="Standard-Endpoint-Config"/>
             <endpoint-config name="Recording-Endpoint-Config">
