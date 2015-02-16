@@ -1236,7 +1236,6 @@
 	<!-- *CATALINA_OPTS* or to your JVM launch parameters -->
 	<!-- SINCE 0.5.2 -->
 
-	<!-- Added by VGI on 16/02/2015 -->
 	<security-constraint>
 		<web-resource-collection>
 			<url-pattern>/*</url-pattern>
