@@ -23,7 +23,7 @@
 		with a SINCE x.y.z attribute and also noted in the release changelog.
 		-->
 	<env-entry>
-		<description>The base folder is used to specify the root location of your Gitblit data.</description>
+		<description>The base folder is used to specify the root location of your data.</description>
 		<env-entry-name>baseFolder</env-entry-name>
 		<env-entry-type>java.lang.String</env-entry-type>
 		<env-entry-value>${contextFolder}/WEB-INF/data</env-entry-value>
@@ -1134,7 +1134,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.loginMessage</param-name>
-		<param-value>gitblit</param-value>
+		<param-value>TEODE repo</param-value>
 	</context-param>
 
 	<!-- This is the message displayed above the repositories table. -->
@@ -1144,7 +1144,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.repositoriesMessage</param-name>
-		<param-value>gitblit</param-value>
+		<param-value>TEODE repo</param-value>
 	</context-param>
 
 	<!-- Ordered list of charsets/encodings to use when trying to display a blob. -->

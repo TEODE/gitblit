@@ -84,7 +84,7 @@ def emailprefix = config.getString('hooks', null, 'emailprefix')
 // set default values
 def toAddresses = []
 if (emailprefix == null)
-emailprefix = '[Gitblit]'
+emailprefix = '[TEODE repo]'
 
 if (mailinglist != null) {
 	def addrs = mailinglist.split(/(,|\s)/)

@@ -411,7 +411,7 @@ class HtmlMailWriter {
         builder.div('class':"navbar navbar-fixed-top") {
             div('class':"navbar-inner") {
                 div('class':"container") {
-                    a('class':"brand", href:"${url}", title:"GitBlit") {
+                    a('class':"brand", href:"${url}", title:"TEODE repo") {
                         img(src:"${url}/gitblt_25_white.png",
                             width:"79",
                             height:"25",
