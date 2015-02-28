@@ -49,8 +49,3 @@ and then you will have to manipulate the -Xmx and -XX:MaxPermSize values.
 
 OpenShift currently allows 300MB of memory per application which includes ssh access, JVM, etc.
 The Gitblit demo hosted on OpenShift Express operates with -Xmx160m and -XX:MaxPermSize=90m.
-
-For more detailed instructions on how to setup and deploy an OpenShift application
-please see this excellent turorial:
-
-https://github.com/opensas/play-demo/wiki/Step-12.5---deploy-to-openshift
