@@ -1,0 +1,3 @@
+## Welcome to TEODE repos
+
+TEODE hosted [Git](http://www.git-scm.com) repositories.
