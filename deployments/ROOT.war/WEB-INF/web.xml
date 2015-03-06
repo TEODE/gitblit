@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.4"
-	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+		 xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
 	<!-- The base folder is used to specify the root location of your Gitblit data.
 	
@@ -28,13 +28,13 @@
 		<env-entry-type>java.lang.String</env-entry-type>
 		<env-entry-value>${contextFolder}/WEB-INF/data</env-entry-value>
 	</env-entry>
-	
+
 	<!-- Gitblit Displayname -->
 	<display-name>
-		Gitblit - 1.5.1
+		TEODE Gitblit
 	</display-name>
 
-	
+
 	<!-- Base folder for repositories. -->
 	<!-- This folder may contain bare and non-bare repositories but Gitblit will only -->
 	<!-- allow you to push to bare repositories. -->
@@ -1134,7 +1134,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.loginMessage</param-name>
-		<param-value>TEODE repo</param-value>
+		<param-value>gitblit</param-value>
 	</context-param>
 
 	<!-- This is the message displayed above the repositories table. -->
@@ -1144,7 +1144,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.repositoriesMessage</param-name>
-		<param-value>TEODE repo</param-value>
+		<param-value>gitblit</param-value>
 	</context-param>
 
 	<!-- Ordered list of charsets/encodings to use when trying to display a blob. -->
@@ -1939,15 +1939,15 @@
 		<param-name>realm.redmine.url</param-name>
 		<param-value>http://example.com/redmine</param-value>
 	</context-param>
- 
-	 
-	 
-<!-- Gitblit Context Listener -->	 
+
+
+
+<!-- Gitblit Context Listener -->
 	<listener>
  		<listener-class>com.gitblit.servlet.GitblitContext</listener-class>
- 	</listener> 	
-	
-	
+ 	</listener>
+
+
 	<!-- Git Servlet
 		 <url-pattern> MUST match: 
 			* GitFilter
@@ -1958,15 +1958,15 @@
 		<servlet-class>com.gitblit.servlet.GitServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>GitServlet</servlet-name>		
+		<servlet-name>GitServlet</servlet-name>
 		<url-pattern>/git/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>GitServlet</servlet-name>		
+		<servlet-name>GitServlet</servlet-name>
 		<url-pattern>/r/*</url-pattern>
 	</servlet-mapping>
 
-	
+
 	<!-- SparkleShare Invite Servlet
 		 <url-pattern> MUST match: 
 			* com.gitblit.Constants.SPARKLESHARE_INVITE_PATH
@@ -1976,11 +1976,11 @@
 		<servlet-class>com.gitblit.servlet.SparkleShareInviteServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>SparkleShareInviteServlet</servlet-name>		
+		<servlet-name>SparkleShareInviteServlet</servlet-name>
 		<url-pattern>/sparkleshare/*</url-pattern>
 	</servlet-mapping>
 
-	
+
 	<!-- Syndication Servlet
 		 <url-pattern> MUST match: 
 			* SyndicationFilter
@@ -1988,14 +1988,14 @@
 			* Wicket Filter ignorePaths parameter -->
 	<servlet>
 		<servlet-name>SyndicationServlet</servlet-name>
-		<servlet-class>com.gitblit.servlet.SyndicationServlet</servlet-class>		
+		<servlet-class>com.gitblit.servlet.SyndicationServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>SyndicationServlet</servlet-name>
 		<url-pattern>/feed/*</url-pattern>
 	</servlet-mapping>
-	
-	
+
+
 	<!-- Zip Servlet
 		 <url-pattern> MUST match: 
 			* ZipServlet
@@ -2003,40 +2003,40 @@
 			* Wicket Filter ignorePaths parameter -->
 	<servlet>
 		<servlet-name>ZipServlet</servlet-name>
-		<servlet-class>com.gitblit.servlet.DownloadZipServlet</servlet-class>		
+		<servlet-class>com.gitblit.servlet.DownloadZipServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>ZipServlet</servlet-name>
 		<url-pattern>/zip/*</url-pattern>
 	</servlet-mapping>
-	
-	
+
+
 	<!-- Federation Servlet
 		 <url-pattern> MUST match: 
 		 	* com.gitblit.Constants.FEDERATION_PATH		 
 			* Wicket Filter ignorePaths parameter -->
 	<servlet>
 		<servlet-name>FederationServlet</servlet-name>
-		<servlet-class>com.gitblit.servlet.FederationServlet</servlet-class>		
+		<servlet-class>com.gitblit.servlet.FederationServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>FederationServlet</servlet-name>
 		<url-pattern>/federation/*</url-pattern>
-	</servlet-mapping>	
-	
-	
+	</servlet-mapping>
+
+
 	<!-- Rpc Servlet
 		 <url-pattern> MUST match: 
 		 	* com.gitblit.Constants.RPC_PATH		 
 			* Wicket Filter ignorePaths parameter -->
 	<servlet>
 		<servlet-name>RpcServlet</servlet-name>
-		<servlet-class>com.gitblit.servlet.RpcServlet</servlet-class>		
+		<servlet-class>com.gitblit.servlet.RpcServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>RpcServlet</servlet-name>
 		<url-pattern>/rpc/*</url-pattern>
-	</servlet-mapping>	
+	</servlet-mapping>
 
 
 	<!-- Pages Servlet
@@ -2049,11 +2049,11 @@
 		<servlet-class>com.gitblit.servlet.PagesServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>PagesServlet</servlet-name>		
+		<servlet-name>PagesServlet</servlet-name>
 		<url-pattern>/pages/*</url-pattern>
-	</servlet-mapping>	
+	</servlet-mapping>
 
-	
+
 	<!-- Logo Servlet
 		 <url-pattern> MUST match: 
 			* Wicket Filter ignorePaths parameter -->
@@ -2062,7 +2062,7 @@
 		<servlet-class>com.gitblit.servlet.LogoServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>LogoServlet</servlet-name>		
+		<servlet-name>LogoServlet</servlet-name>
 		<url-pattern>/logo.png</url-pattern>
 	</servlet-mapping>
 
@@ -2075,7 +2075,7 @@
 		<servlet-class>com.gitblit.servlet.PtServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>PtServlet</servlet-name>		
+		<servlet-name>PtServlet</servlet-name>
 		<url-pattern>/pt</url-pattern>
 	</servlet-mapping>
 
@@ -2088,7 +2088,7 @@
 		<servlet-class>com.gitblit.servlet.BranchGraphServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>BranchGraphServlet</servlet-name>		
+		<servlet-name>BranchGraphServlet</servlet-name>
 		<url-pattern>/graph/*</url-pattern>
 	</servlet-mapping>
 
@@ -2100,7 +2100,7 @@
 		<servlet-class>com.gitblit.servlet.RobotsTxtServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>RobotsTxtServlet</servlet-name>		
+		<servlet-name>RobotsTxtServlet</servlet-name>
 		<url-pattern>/robots.txt</url-pattern>
 	</servlet-mapping>
 
@@ -2121,8 +2121,8 @@
 		<filter-name>GitFilter</filter-name>
 		<url-pattern>/r/*</url-pattern>
 	</filter-mapping>
-	
-	
+
+
 	<!-- Syndication Restriction Filter
 		 <url-pattern> MUST match: 
 			* SyndicationServlet
@@ -2136,8 +2136,8 @@
 		<filter-name>SyndicationFilter</filter-name>
 		<url-pattern>/feed/*</url-pattern>
 	</filter-mapping>
-	
-	
+
+
 	<!-- Download Zip Restriction Filter
 		 <url-pattern> MUST match: 
 			* DownloadZipServlet
@@ -2152,7 +2152,7 @@
 		<url-pattern>/zip/*</url-pattern>
 	</filter-mapping>
 
-		
+
 	<!-- Rpc Restriction Filter
 		 <url-pattern> MUST match: 
 			* RpcServlet
@@ -2181,49 +2181,49 @@
 		<filter-name>PagesFilter</filter-name>
 		<url-pattern>/pages/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 		<filter-name>EnforceAuthenticationFilter</filter-name>
 		<filter-class>com.gitblit.servlet.EnforceAuthenticationFilter</filter-class>
 	</filter>
 	<filter-mapping>
-        <filter-name>EnforceAuthenticationFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+		<filter-name>EnforceAuthenticationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 
 	<!-- Wicket Filter -->
-    <filter>
-        <filter-name>wicketFilter</filter-name>
-        <filter-class>
-            com.gitblit.wicket.GitblitWicketFilter
-        </filter-class>        
-        <init-param>
-            <param-name>ignorePaths</param-name>
-            <!-- Paths should match 
-             	* SyndicationFilter <url-pattern>
-             	* SyndicationServlet <url-pattern>
-             	* com.gitblit.Constants.SYNDICATION_PATH
-             	* GitFilter <url-pattern>
-             	* GitServlet <url-pattern>
-             	* com.gitblit.Constants.GIT_PATH
-             	* SparkleshareInviteServlet <url-pattern>
-             	* com.gitblit.Constants.SPARKLESHARE_INVITE_PATH
-             	* Zipfilter <url-pattern>
-             	* ZipServlet <url-pattern>
-             	* com.gitblit.Constants.ZIP_PATH
-             	* FederationServlet <url-pattern>
-             	* RpcFilter <url-pattern>
-             	* RpcServlet <url-pattern>
-             	* PagesFilter <url-pattern>
-             	* PagesServlet <url-pattern>
-             	* com.gitblit.Constants.PAGES_PATH -->
-            <param-value>r/,git/,pt,feed/,zip/,federation/,rpc/,pages/,robots.txt,logo.png,graph/,sparkleshare/</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>wicketFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
+	<filter>
+		<filter-name>wicketFilter</filter-name>
+		<filter-class>
+			com.gitblit.wicket.GitblitWicketFilter
+		</filter-class>
+		<init-param>
+			<param-name>ignorePaths</param-name>
+			<!-- Paths should match
+                 * SyndicationFilter <url-pattern>
+                 * SyndicationServlet <url-pattern>
+                 * com.gitblit.Constants.SYNDICATION_PATH
+                 * GitFilter <url-pattern>
+                 * GitServlet <url-pattern>
+                 * com.gitblit.Constants.GIT_PATH
+                 * SparkleshareInviteServlet <url-pattern>
+                 * com.gitblit.Constants.SPARKLESHARE_INVITE_PATH
+                 * Zipfilter <url-pattern>
+                 * ZipServlet <url-pattern>
+                 * com.gitblit.Constants.ZIP_PATH
+                 * FederationServlet <url-pattern>
+                 * RpcFilter <url-pattern>
+                 * RpcServlet <url-pattern>
+                 * PagesFilter <url-pattern>
+                 * PagesServlet <url-pattern>
+                 * com.gitblit.Constants.PAGES_PATH -->
+			<param-value>r/,git/,pt,feed/,zip/,federation/,rpc/,pages/,robots.txt,logo.png,graph/,sparkleshare/</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>wicketFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 </web-app>
