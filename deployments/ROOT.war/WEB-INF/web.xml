@@ -1134,7 +1134,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.loginMessage</param-name>
-		<param-value>teode</param-value>
+		<param-value>${baseFolder}/teode</param-value>
 	</context-param>
 
 	<!-- This is the message displayed above the repositories table. -->
@@ -1144,7 +1144,7 @@
 	<!-- BASEFOLDER -->
 	<context-param>
 		<param-name>web.repositoriesMessage</param-name>
-		<param-value>teode</param-value>
+		<param-value>${baseFolder}/teode</param-value>
 	</context-param>
 
 	<!-- Ordered list of charsets/encodings to use when trying to display a blob. -->
